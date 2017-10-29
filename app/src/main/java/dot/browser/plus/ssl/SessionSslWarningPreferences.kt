@@ -1,0 +1,28 @@
+package dot.browser.plus.ssl
+
+import dot.browser.plus.utils.domainForUrl
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/**
+ * An implementation of [SslWarningPreferences] which stores user preferences in memory and does not
+ * persist them past an app restart.
+ */
+@Singleton
+class SessionSslWarningPreferences @Inject constructor() : SslWarningPreferences {
+
+    private val ignoredSslWarnings = hashMapOf<String, SslWarningPreferences.Behavior>()
+
+    override fun recallBehaviorForDomain(url: String?): SslWarningPreferences.Behavior? {
+        domainForUrl(url)?.let {
+            return ignoredSslWarnings[it]
+        }
+        return null
+    }
+
+    override fun rememberBehaviorForDomain(url: String, behavior: SslWarningPreferences.Behavior) {
+        domainForUrl(url)?.let {
+            ignoredSslWarnings.put(it, behavior)
+        }
+    }
+}
